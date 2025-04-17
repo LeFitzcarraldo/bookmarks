@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bookmarks App Pro</title>
+    <title>Bookmarks App Pro (Final)</title>
     <style>
-        /* --- CSS (Sin cambios respecto a la versión anterior 'full') --- */
+        /* --- Variables y Estilos Base --- */
         :root {
             --bg-color: #121212; --text-color: #e0e0e0; --card-bg: #1e1e1e;
             --card-border: #444; --link-color: #64b5f6; --desc-color: #b0b0b0;
@@ -21,17 +21,32 @@
             --pinned-color: #ffeb3b; /* Color para pin */
         }
         body { font-family: sans-serif; margin: 0; padding: 20px; background-color: var(--bg-color); color: var(--text-color); }
-        .main-header { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 15px; margin-bottom: 15px; padding: 0 10px; }
+
+        /* --- Encabezado Corregido (Usando Grid) --- */
+        .main-header {
+            display: grid; grid-template-columns: auto 1fr auto; align-items: center;
+            gap: 15px; margin-bottom: 15px; padding: 0 10px;
+        }
         .main-header h1 { grid-column: 2 / 3; text-align: center; margin: 0; color: var(--heading-color); }
         .header-actions { grid-column: 3 / 4; justify-self: end; display: flex; gap: 10px; }
         .header-actions button, .header-actions label { background-color: var(--btn-add-column-bg); color: var(--text-color); border: 1px solid var(--input-border); padding: 8px 15px; border-radius: 5px; cursor: pointer; font-size: 0.9em; transition: background-color 0.2s; white-space: nowrap; }
         .header-actions button:hover, .header-actions label:hover { background-color: var(--btn-add-column-hover); }
         #import-file { display: none; }
+
+        /* --- Búsqueda --- */
         .search-container { margin: 15px auto; max-width: 600px; }
         #search-box { width: 95%; padding: 10px; border: 1px solid var(--input-border); border-radius: 4px; background-color: var(--input-bg); color: var(--text-color); font-size: 1em; display: block; margin: auto; }
+
         h2 { text-align: center; color: var(--heading-color); margin-top: 25px; }
         .columns-container { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 20px; margin-bottom: 30px; }
-        .column { flex: 1; min-width: 280px; padding: 15px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.4); min-height: 300px; border: 1px solid; background-color: var(--col-bg); transition: background-color 0.3s; display: flex; flex-direction: column; position: relative; }
+
+        /* --- Columnas Corregidas (Ancho Fluido) --- */
+        .column {
+            flex: 1; min-width: 280px; padding: 15px; border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4); min-height: 300px; border: 1px solid;
+            background-color: var(--col-bg); transition: background-color 0.3s;
+            display: flex; flex-direction: column; position: relative;
+        }
         .column-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed var(--card-border); margin-bottom: 15px; padding-bottom: 10px; }
         .column h3 { margin: 0; text-align: left; color: var(--column-header-color); padding: 5px; cursor: pointer; transition: background-color 0.2s; border-radius: 4px; min-height: 1.2em; flex-grow: 1; }
         .column h3:hover, .column h3:focus { background-color: var(--column-header-editing-bg); }
@@ -42,6 +57,8 @@
         .column-blue { --col-bg: var(--col1-bg); border-color: var(--col1-border); }
         .column-green { --col-bg: var(--col2-bg); border-color: var(--col2-border); }
         .column-red { --col-bg: var(--col3-bg); border-color: var(--col3-border); }
+
+        /* --- Bookmarks --- */
         .bookmark-item { background-color: var(--card-bg); border: 1px solid var(--card-border); border-radius: 5px; padding: 10px 15px; margin-bottom: 10px; position: relative; word-wrap: break-word; transition: background-color 0.3s, border-color 0.3s, opacity 0.2s; cursor: grab; user-select: none; display: flex; align-items: flex-start; gap: 8px; }
         .bookmark-item.dragging { opacity: 0.5; }
         .bookmark-item.drag-over { border-bottom: var(--drag-over-border); margin-bottom: calc(10px - 2px); }
@@ -60,6 +77,8 @@
         .delete-bookmark-btn { color: var(--btn-delete-bg); }
         .pin-bookmark-btn { color: #ccc; }
         .pin-bookmark-btn.pinned-active { color: var(--pinned-color); }
+
+        /* --- Formularios y Modal --- */
         #add-bookmark-form { background-color: var(--form-bg); color: var(--text-color); padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.4); margin-bottom: 30px; max-width: 600px; margin-left: auto; margin-right: auto; transition: background-color 0.3s; }
         #add-bookmark-form label { display: block; margin-bottom: 5px; font-weight: bold; color: var(--text-color); }
         #add-bookmark-form input, #add-bookmark-form textarea, #add-bookmark-form select { width: 95%; padding: 10px; margin-bottom: 15px; border: 1px solid var(--input-border); border-radius: 4px; font-size: 1em; background-color: var(--input-bg); color: var(--text-color); transition: background-color 0.3s, border-color 0.3s, color 0.3s; }
@@ -78,6 +97,7 @@
         .modal button:hover { background-color: var(--btn-submit-hover); }
         .modal button[type="button"] { background-color: var(--btn-edit-bg); margin-left: 10px; }
         .modal button[type="button"]:hover { background-color: var(--btn-edit-hover); }
+
         .instructions { background-color: #333; color: #f1c40f; border: 1px solid #555; padding: 15px; border-radius: 5px; margin-bottom: 20px; text-align: center; }
         .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
     </style>
@@ -89,8 +109,7 @@
         <div class="header-actions">
              <button id="export-btn" type="button">Exportar</button>
              <label for="import-file" id="import-btn">Importar</label>
-             <input type="file" id="import-file" accept=".json">
-             <button id="add-column-btn" type="button">Agregar Columna</button>
+             <input type="file" id="import-file" accept=".json"> <button id="add-column-btn" type="button">Agregar Columna</button>
         </div>
     </header>
 
@@ -114,7 +133,6 @@
     </div>
 
     <div class="columns-container"></div>
-
     <div id="edit-bookmark-modal" class="modal">
         <div class="modal-content">
             <span class="modal-close-btn" aria-label="Cerrar">&times;</span>
@@ -130,13 +148,12 @@
         </div>
     </div>
 
-
     <script>
-        const APP_STORAGE_KEY = 'bookmarksAppData_v5_full';
+        const APP_STORAGE_KEY = 'bookmarksAppData_v5_full'; // Cambia si haces cambios incompatibles
         const COLUMN_COLORS = ['column-blue', 'column-green', 'column-red'];
         let columnColorIndex = 0;
         let appState = { columns: [], bookmarks: [] };
-        let draggedItem = null;
+        let draggedItem = null; // Para D&D Nativo
 
         // --- Inicialización ---
         document.addEventListener('DOMContentLoaded', () => {
@@ -154,19 +171,24 @@
             document.getElementById('import-btn').addEventListener('click', () => document.getElementById('import-file').click());
             document.getElementById('import-file').addEventListener('change', handleImportFileChange);
             // Búsqueda
-            document.getElementById('search-box').addEventListener('input', handleSearch);
+             document.getElementById('search-box').addEventListener('input', handleSearch);
             // Contenedor Columnas (Clicks y D&D)
             const columnsContainer = document.querySelector('.columns-container');
-            columnsContainer.addEventListener('click', handleColumnClick);
-            columnsContainer.addEventListener('dblclick', handleColumnTitleDblClick);
-            columnsContainer.addEventListener('blur', handleTitleEditEnd, true);
-            columnsContainer.addEventListener('keydown', handleTitleEditKeydown, true);
-            columnsContainer.addEventListener('dragstart', handleDragStart);
-            columnsContainer.addEventListener('dragend', handleDragEnd);
-            columnsContainer.addEventListener('dragover', handleDragOver);
-            columnsContainer.addEventListener('dragenter', handleDragEnter);
-            columnsContainer.addEventListener('dragleave', handleDragLeave);
-            columnsContainer.addEventListener('drop', handleDrop);
+            if (columnsContainer) { // Verificar que exista antes de añadir listeners
+                 columnsContainer.addEventListener('click', handleColumnClick);
+                 columnsContainer.addEventListener('dblclick', handleColumnTitleDblClick);
+                 columnsContainer.addEventListener('blur', handleTitleEditEnd, true);
+                 columnsContainer.addEventListener('keydown', handleTitleEditKeydown, true);
+                 columnsContainer.addEventListener('dragstart', handleDragStart);
+                 columnsContainer.addEventListener('dragend', handleDragEnd);
+                 columnsContainer.addEventListener('dragover', handleDragOver);
+                 columnsContainer.addEventListener('dragenter', handleDragEnter);
+                 columnsContainer.addEventListener('dragleave', handleDragLeave);
+                 columnsContainer.addEventListener('drop', handleDrop);
+             } else {
+                 console.error("¡ERROR FATAL! No se encontró '.columns-container'. Las columnas y D&D no funcionarán.");
+                 alert("Error: El contenedor principal de columnas no se encontró en el HTML.");
+             }
             // Modal
             const modal = document.getElementById('edit-bookmark-modal');
             modal.querySelector('.modal-close-btn').addEventListener('click', closeModal);
@@ -176,28 +198,36 @@
 
         // --- Carga y Guardado del Estado ---
         function loadAppState() {
-             console.log('--- Iniciando loadAppState ---'); // LOG
+             console.log('--- Iniciando loadAppState ---');
              const savedData = localStorage.getItem(APP_STORAGE_KEY);
-             console.log('Datos guardados crudos:', savedData); // LOG
+             console.log('Datos guardados crudos:', savedData);
              if (savedData) {
                  try {
                      appState = JSON.parse(savedData);
-                     if (!appState.columns) appState.columns = [];
-                     if (!appState.bookmarks) appState.bookmarks = [];
+                     // Validar y asegurar estructura mínima
+                     if (!appState || typeof appState !== 'object') throw new Error("Invalid data structure");
+                     appState.columns = appState.columns && Array.isArray(appState.columns) ? appState.columns : [];
+                     appState.bookmarks = appState.bookmarks && Array.isArray(appState.bookmarks) ? appState.bookmarks : [];
+                     // Asegurar defaults para nuevas propiedades en bookmarks existentes
                      appState.bookmarks.forEach(bm => {
                          if (bm.isPinned === undefined) bm.isPinned = false;
-                         delete bm.parentId;
+                         delete bm.parentId; // Limpiar propiedad de anidamiento si existía
                      });
-                 } catch (e) { console.error("Error al parsear datos guardados:", e); setDefaultState(); }
+                 } catch (e) {
+                     console.error("Error al parsear datos guardados, usando estado por defecto.", e);
+                     setDefaultState(); // Usar defaults si hay error
+                 }
              } else {
-                 console.log("No hay datos guardados, usando estado por defecto."); // LOG
+                 console.log("No hay datos guardados, usando estado por defecto.");
                  setDefaultState();
              }
+             // Asegurar que el índice de color es correcto
              columnColorIndex = appState.columns.length % COLUMN_COLORS.length;
-             console.log('Estado ANTES de ordenar y renderizar:', JSON.stringify(appState)); // LOG
-             sortAppStateBookmarks(); // Ordenar antes de renderizar
-             renderApp();
+             console.log('Estado ANTES de ordenar y renderizar:', JSON.stringify(appState));
+             sortAppStateBookmarks(); // Ordenar (importante si se cargaron datos desordenados)
+             renderApp(); // Renderizar la aplicación
         }
+
         function setDefaultState() {
              columnColorIndex = 0;
              appState = {
@@ -206,165 +236,408 @@
                      { id: `col-${Date.now()}-2`, title: "Trabajo", colorClass: COLUMN_COLORS[1] },
                      { id: `col-${Date.now()}-3`, title: "Ocio", colorClass: COLUMN_COLORS[2] }
                  ],
-                 bookmarks: []
+                 bookmarks: [] // isPinned se añadirá con valor 'false' al crear nuevos
              };
              columnColorIndex = appState.columns.length % COLUMN_COLORS.length;
-             console.log("Estado inicial por defecto establecido."); // LOG
+             console.log("Estado inicial por defecto establecido.");
         }
+
         function saveAppState() {
+            // Actualizar títulos de columnas desde el DOM
             appState.columns.forEach(column => {
                 const colEl = document.getElementById(column.id);
                 if(colEl) {
                     const titleEl = colEl.querySelector('h3');
+                    // Asegurarse que titleEl existe antes de leer textContent
                     if(titleEl) column.title = titleEl.textContent.trim() || "Sin Título";
+                    else console.warn("No se encontró H3 para columna:", column.id);
+                } else {
+                    console.warn("No se encontró elemento DOM para columna:", column.id);
+                    // Considerar eliminar la columna del estado si el elemento no existe?
+                    // appState.columns = appState.columns.filter(c => c.id !== column.id);
                 }
             });
-            // El orden de bookmarks ya debería estar correcto en appState por sort y sync
-            localStorage.setItem(APP_STORAGE_KEY, JSON.stringify(appState));
-            console.log("Estado guardado.");
+            // Asegurarse que el orden de bookmarks en appState refleja el DOM
+            // (syncAppStateOrderFromDOM lo hace antes de guardar si es necesario)
+            // Asegurarse que el orden por pinned está aplicado
+            sortAppStateBookmarks();
+
+            try {
+                localStorage.setItem(APP_STORAGE_KEY, JSON.stringify(appState));
+                console.log("Estado guardado.");
+            } catch (e) {
+                 console.error("Error al guardar en localStorage:", e);
+                 alert("Error al guardar datos. Puede que el almacenamiento esté lleno.");
+            }
         }
+
          // --- Ordenamiento (para Pinned) ---
          function sortAppStateBookmarks() {
+             // Ordena el array appState.bookmarks IN-PLACE
              appState.bookmarks.sort((a, b) => {
                  const colIndexA = appState.columns.findIndex(c => c.id === a.columnId);
                  const colIndexB = appState.columns.findIndex(c => c.id === b.columnId);
-                 if (colIndexA !== colIndexB) return colIndexA - colIndexB;
-                 if (a.isPinned && !b.isPinned) return -1;
-                 if (!a.isPinned && b.isPinned) return 1;
-                 return 0; // Mantener orden relativo si ambos son pinned o no-pinned
+                 // Mantener bookmarks dentro de su columna original si una de las columnas no existe (importante durante borrado)
+                 if (colIndexA === -1 || colIndexB === -1) return 0;
+                 if (colIndexA !== colIndexB) return colIndexA - colIndexB; // Ordenar por columna primero
+                 if (a.isPinned && !b.isPinned) return -1; // Pinned A va primero
+                 if (!a.isPinned && b.isPinned) return 1;  // Pinned B va primero
+                 return 0; // Mantener orden relativo para el resto
              });
-             // console.log("Bookmarks ordenados por pin."); // Opcional: Descomentar para debug
+             // console.log("Bookmarks ordenados por pin.");
          }
+
 
         // --- Renderizado ---
         function renderApp() {
-             console.log('--- Iniciando renderApp ---'); // LOG
-             // El estado ya está ordenado por `loadAppState`
+             console.log('--- Iniciando renderApp ---');
+             // El estado ya está ordenado por `loadAppState` -> `sortAppStateBookmarks`
              renderColumns();
-             renderAllBookmarksInOrder();
-             updateBookmarkColumnDropdown(); // <-- Llamar aquí
-             applySearchFilter();
+             renderAllBookmarksInOrder(); // Renderiza según el estado ordenado
+             updateBookmarkColumnDropdown();
+             applySearchFilter(); // Aplicar filtro actual
         }
+
         function renderColumns() {
-            console.log('--- Iniciando renderColumns. Columnas:', appState.columns.length); // LOG
+            console.log('--- Iniciando renderColumns. Columnas:', appState.columns.length);
             const columnsContainer = document.querySelector('.columns-container');
+             if (!columnsContainer) { console.error("Contenedor de columnas no encontrado en renderColumns"); return; } // Check extra
             columnsContainer.innerHTML = '';
              appState.columns.forEach(columnData => {
                  columnsContainer.appendChild(createColumnElement(columnData));
              });
         }
-        function createColumnElement(columnData) { /* ... sin cambios ... */ } // Código igual que versión anterior
+
+        function createColumnElement(columnData) {
+             const columnElement = document.createElement('div');
+             columnElement.className = `column ${columnData.colorClass}`; columnElement.id = columnData.id;
+             const headerElement = document.createElement('div'); headerElement.className = 'column-header';
+             const titleElement = document.createElement('h3'); titleElement.textContent = columnData.title; titleElement.setAttribute('tabindex', '0');
+             const deleteBtn = document.createElement('button'); deleteBtn.className = 'delete-column-btn'; deleteBtn.innerHTML = '&times;'; deleteBtn.setAttribute('aria-label', `Eliminar ${columnData.title}`); deleteBtn.dataset.columnId = columnData.id;
+             headerElement.appendChild(titleElement); headerElement.appendChild(deleteBtn);
+             const bookmarksListElement = document.createElement('div'); bookmarksListElement.className = 'bookmarks-list';
+             columnElement.appendChild(headerElement); columnElement.appendChild(bookmarksListElement);
+             return columnElement;
+        }
+
         function renderAllBookmarksInOrder() {
-            console.log('--- Iniciando renderAllBookmarksInOrder. Bookmarks:', appState.bookmarks.length); // LOG
+            console.log('--- Iniciando renderAllBookmarksInOrder. Bookmarks:', appState.bookmarks.length);
             document.querySelectorAll('.bookmarks-list').forEach(list => list.innerHTML = '');
              appState.bookmarks.forEach(bookmark => {
                  const column = document.getElementById(bookmark.columnId);
                  const bookmarksList = column?.querySelector('.bookmarks-list');
                  if (bookmarksList) {
                      bookmarksList.appendChild(createBookmarkElement(bookmark));
-                 } else { /* ... advertencia ... */ }
+                 } else { /* Advertencia si la columna no existe (puede pasar brevemente al borrar) */ }
              });
+             applySearchFilter(); // Re-aplicar filtro después de re-renderizar
         }
-        function createBookmarkElement(bookmark) { /* ... sin cambios ... */ } // Código igual que versión anterior
-        function updateBookmarkColumnDropdown() { // ** Versión Mejorada **
-            console.log('--- Iniciando updateBookmarkColumnDropdown. Columnas:', appState.columns.length); // LOG
-            const selectElement = document.getElementById('bookmark-column');
-            selectElement.innerHTML = ''; // Limpiar
 
-            if (!appState.columns || appState.columns.length === 0) { // Comprobar nulidad también
-                console.log("No hay columnas para el dropdown."); // LOG
+        function createBookmarkElement(bookmark) {
+             const bookmarkItem = document.createElement('div');
+             bookmarkItem.className = 'bookmark-item';
+             if (bookmark.isPinned) { bookmarkItem.classList.add('pinned'); }
+             bookmarkItem.dataset.id = bookmark.id;
+             bookmarkItem.dataset.url = bookmark.url || '#'; // Default
+             bookmarkItem.dataset.title = bookmark.title || 'Sin Título';
+             bookmarkItem.dataset.desc = bookmark.desc || '';
+             bookmarkItem.draggable = true;
+
+             const faviconContainer = document.createElement('div');
+             faviconContainer.className = 'bookmark-favicon-container';
+             try {
+                 const url = new URL(bookmark.url); const domain = url.hostname;
+                 if (domain) { // Solo intentar si hay dominio
+                     const favicon = document.createElement('img');
+                     favicon.className = 'bookmark-favicon';
+                     favicon.src = `https://www.google.com/s2/favicons?sz=16&domain_url=${encodeURIComponent(domain)}`; // Usar domain_url
+                     favicon.alt = ""; favicon.width = 16; favicon.height = 16;
+                     favicon.onerror = () => { favicon.style.visibility = 'hidden'; }; // Ocultar si falla
+                     faviconContainer.appendChild(favicon);
+                 }
+             } catch (e) { /* No hacer nada si la URL es inválida */ }
+
+             const contentContainer = document.createElement('div');
+             contentContainer.className = 'bookmark-content';
+             let displayUrl = bookmark.url; try { new URL(displayUrl); } catch(_) { displayUrl = '#'; } // Validar URL para href
+             contentContainer.innerHTML = `
+                  <h4><a href="${displayUrl}" target="_blank" rel="noopener noreferrer">${escapeHTML(bookmark.title || 'Sin Título')}</a></h4>
+                  ${bookmark.desc ? `<p>${escapeHTML(bookmark.desc)}</p>` : ''}
+             `;
+
+             const actionsContainer = document.createElement('div');
+             actionsContainer.className = 'bookmark-actions';
+             actionsContainer.innerHTML = `
+                  <button class="pin-bookmark-btn ${bookmark.isPinned ? 'pinned-active' : ''}" data-bookmark-id="${bookmark.id}" title="Fijar/Desfijar">📌</button>
+                  <button class="edit-bookmark-btn" data-bookmark-id="${bookmark.id}" title="Editar">✎</button>
+                  <button class="delete-bookmark-btn" data-bookmark-id="${bookmark.id}" title="Eliminar">🗑️</button>
+             `;
+
+             bookmarkItem.appendChild(faviconContainer);
+             bookmarkItem.appendChild(contentContainer);
+             bookmarkItem.appendChild(actionsContainer);
+             return bookmarkItem;
+        }
+
+        function updateBookmarkColumnDropdown() { // ** Versión Mejorada **
+            console.log('--- Iniciando updateBookmarkColumnDropdown. Columnas:', appState.columns.length);
+            const selectElement = document.getElementById('bookmark-column');
+            if (!selectElement) return; // Salir si no existe el select
+            selectElement.innerHTML = '';
+
+            if (!appState.columns || appState.columns.length === 0) {
                 const placeholderOption = document.createElement('option');
-                placeholderOption.value = "";
-                placeholderOption.textContent = "No hay columnas disponibles";
-                placeholderOption.disabled = true;
-                placeholderOption.selected = true;
-                selectElement.appendChild(placeholderOption);
-                selectElement.disabled = true;
+                placeholderOption.value = ""; placeholderOption.textContent = "No hay columnas";
+                placeholderOption.disabled = true; placeholderOption.selected = true;
+                selectElement.appendChild(placeholderOption); selectElement.disabled = true;
             } else {
-                console.log(`Llenando dropdown con ${appState.columns.length} columnas.`); // LOG
                 selectElement.disabled = false;
                 const placeholderOption = document.createElement('option');
-                placeholderOption.value = "";
-                placeholderOption.textContent = "Selecciona una columna...";
-                placeholderOption.disabled = true;
-                placeholderOption.selected = true;
+                placeholderOption.value = ""; placeholderOption.textContent = "Selecciona columna...";
+                placeholderOption.disabled = true; placeholderOption.selected = true;
                 selectElement.appendChild(placeholderOption);
-
                 appState.columns.forEach(column => {
                     const option = document.createElement('option');
-                    option.value = column.id;
-                    option.textContent = column.title;
+                    option.value = column.id; option.textContent = column.title;
                     selectElement.appendChild(option);
                 });
             }
         }
 
-
         // --- Manejadores de Eventos ---
-        function handleAddBookmark(event) { /* ... sin cambios ... */ }
-        function handleAddColumn() { /* ... sin cambios ... */ }
-        function handleColumnClick(event) { // Añadido manejo de Pin
-             if (event.target.classList.contains('pin-bookmark-btn')) {
-                 togglePinBookmark(event.target.dataset.bookmarkId);
-             }
-             else if (event.target.classList.contains('delete-bookmark-btn')) { /* ... */ }
-             else if (event.target.classList.contains('edit-bookmark-btn')) { /* ... */ }
-             else if (event.target.classList.contains('delete-column-btn')) { /* ... */ }
+        function handleAddBookmark(event) {
+             event.preventDefault();
+             const url = document.getElementById('bookmark-url').value.trim();
+             const title = document.getElementById('bookmark-title').value.trim();
+             const desc = document.getElementById('bookmark-desc').value.trim();
+             const targetColumnId = document.getElementById('bookmark-column').value;
+             if (!url || !title || !targetColumnId) { alert('Completa URL, Título y Columna.'); return; }
+             const newBookmark = { id: `bm-${Date.now()}`, url, title, desc, columnId: targetColumnId, isPinned: false };
+             appState.bookmarks.push(newBookmark);
+             sortAppStateBookmarks();
+             renderAllBookmarksInOrder(); // Re-renderizar para orden correcto
+             saveAppState();
+             event.target.reset();
         }
-        // --- Pin / Fijar ---
-         function togglePinBookmark(bookmarkId) {
+        function handleAddColumn() {
+             const newColumnId = `col-${Date.now()}`;
+             const newColumnTitle = `Nueva Columna ${appState.columns.length + 1}`;
+             const colorClass = COLUMN_COLORS[columnColorIndex % COLUMN_COLORS.length]; columnColorIndex++;
+             const newColumnData = { id: newColumnId, title: newColumnTitle, colorClass: colorClass };
+             appState.columns.push(newColumnData);
+             // Renderizar solo la nueva columna y actualizar dropdown
+             const columnsContainer = document.querySelector('.columns-container');
+             if(columnsContainer) columnsContainer.appendChild(createColumnElement(newColumnData));
+             updateBookmarkColumnDropdown();
+             saveAppState();
+        }
+        function handleColumnClick(event) {
+             const target = event.target;
+             const bookmarkItem = target.closest('.bookmark-item');
+             const columnElement = target.closest('.column');
+
+             if (target.classList.contains('pin-bookmark-btn')) {
+                 togglePinBookmark(target.dataset.bookmarkId);
+             } else if (target.classList.contains('delete-bookmark-btn')) {
+                 const bookmarkId = target.dataset.bookmarkId;
+                 if (confirm(`¿Eliminar bookmark?`)) {
+                     appState.bookmarks = appState.bookmarks.filter(bm => bm.id !== bookmarkId);
+                     bookmarkItem?.remove(); // Quitar del DOM si existe
+                     saveAppState();
+                 }
+             } else if (target.classList.contains('edit-bookmark-btn')) {
+                 openEditModal(target.dataset.bookmarkId);
+             } else if (target.classList.contains('delete-column-btn')) {
+                 const columnId = target.dataset.columnId;
+                 const columnTitle = appState.columns.find(c => c.id === columnId)?.title || 'esta columna';
+                 if (confirm(`¿SEGURO eliminar "${columnTitle}" y TODOS sus bookmarks?`)) {
+                     appState.columns = appState.columns.filter(col => col.id !== columnId);
+                     appState.bookmarks = appState.bookmarks.filter(bm => bm.columnId !== columnId);
+                     columnElement?.remove(); // Quitar del DOM si existe
+                     updateBookmarkColumnDropdown();
+                     saveAppState();
+                 }
+             }
+        }
+        function togglePinBookmark(bookmarkId) {
              const bookmarkIndex = appState.bookmarks.findIndex(bm => bm.id === bookmarkId);
              if (bookmarkIndex !== -1) {
                  appState.bookmarks[bookmarkIndex].isPinned = !appState.bookmarks[bookmarkIndex].isPinned;
                  sortAppStateBookmarks();
-                 renderAllBookmarksInOrder(); // Re-renderizar para mostrar cambio de orden/estilo
+                 renderAllBookmarksInOrder(); // Re-renderizar para orden y estilo
                  saveAppState();
              }
          }
         // --- Edición Título Columna ---
-        function handleColumnTitleDblClick(event){ /* ... sin cambios ... */ }
-        function handleTitleEditEnd(event){ /* ... sin cambios ... */ }
-        function handleTitleEditKeydown(event){ /* ... sin cambios ... */ }
-        function finishTitleEditing(titleElement, shouldSave = true){ /* ... sin cambios ... */ }
+        function handleColumnTitleDblClick(event){ if (event.target.tagName === 'H3') { event.target.contentEditable = 'true'; event.target.focus(); document.execCommand('selectAll', false, null); } }
+        function handleTitleEditEnd(event){ if (event.target.tagName === 'H3' && event.target.contentEditable === 'true') { finishTitleEditing(event.target); } }
+        function handleTitleEditKeydown(event){ if (event.target.tagName === 'H3' && event.target.contentEditable === 'true') { if (event.key === 'Enter') { event.preventDefault(); finishTitleEditing(event.target); } else if (event.key === 'Escape') { finishTitleEditing(event.target, false); } } }
+        function finishTitleEditing(titleElement, shouldSave = true){
+             titleElement.contentEditable = 'false';
+             const newTitle = titleElement.textContent.trim(); if (!newTitle) titleElement.textContent = "Sin Título";
+             if (shouldSave) {
+                // Guardar el estado (saveAppState leerá el nuevo título del DOM)
+                 saveAppState();
+                 // Actualizar el dropdown que depende de los títulos
+                 updateBookmarkColumnDropdown();
+             } else {
+                 const id = titleElement.closest('.column')?.id; // Usar ? por si acaso
+                 if (id) titleElement.textContent = appState.columns.find(c=>c.id===id)?.title||'Sin Título';
+             }
+         }
         // --- Edición Bookmark (Modal) ---
-        function openEditModal(bookmarkId) { /* ... sin cambios ... */ }
-        function closeModal() { /* ... sin cambios ... */ }
-        function handleEditBookmarkSubmit(event) { /* ... sin cambios ... */ }
-        // Helper para actualizar DOM de bookmark editado
-         function renderSingleBookmarkDOM(bookmarkItemElement, bookmarkData) { /* ... sin cambios ... */ }
+        function openEditModal(bookmarkId) {
+            const bookmark = appState.bookmarks.find(bm => bm.id === bookmarkId); if (!bookmark) return;
+            const modal = document.getElementById('edit-bookmark-modal');
+            modal.querySelector('#edit-bookmark-id').value = bookmark.id;
+            modal.querySelector('#edit-bookmark-url').value = bookmark.url;
+            modal.querySelector('#edit-bookmark-title').value = bookmark.title;
+            modal.querySelector('#edit-bookmark-desc').value = bookmark.desc;
+            modal.style.display = 'block';
+        }
+        function closeModal() { document.getElementById('edit-bookmark-modal').style.display = 'none'; document.getElementById('edit-bookmark-form').reset(); }
+        function handleEditBookmarkSubmit(event) {
+            event.preventDefault();
+            const modal = document.getElementById('edit-bookmark-modal');
+            const id = modal.querySelector('#edit-bookmark-id').value;
+            const url = modal.querySelector('#edit-bookmark-url').value.trim();
+            const title = modal.querySelector('#edit-bookmark-title').value.trim();
+            const desc = modal.querySelector('#edit-bookmark-desc').value.trim();
+            if (!id || !url || !title) { return; }
+            const bookmarkIndex = appState.bookmarks.findIndex(bm => bm.id === id);
+            if (bookmarkIndex !== -1) {
+                // Actualizar estado manteniendo isPinned
+                appState.bookmarks[bookmarkIndex] = { ...appState.bookmarks[bookmarkIndex], url, title, desc };
+                // Actualizar DOM del item específico
+                 const item = document.querySelector(`.bookmark-item[data-id="${id}"]`);
+                 if(item) { renderSingleBookmarkDOM(item, appState.bookmarks[bookmarkIndex]); }
+                 saveAppState(); closeModal();
+            } else { alert("Error: Bookmark no encontrado."); }
+        }
+        // Helper para actualizar DOM de bookmark existente
+        function renderSingleBookmarkDOM(bookmarkItemElement, bookmarkData) {
+             const faviconContainer = bookmarkItemElement.querySelector('.bookmark-favicon-container');
+             if (faviconContainer) {
+                 faviconContainer.innerHTML = '';
+                 try {
+                     const url = new URL(bookmarkData.url); const domain = url.hostname;
+                     if(domain){
+                         const favicon = document.createElement('img');
+                         favicon.className = 'bookmark-favicon'; favicon.src = `https://www.google.com/s2/favicons?sz=16&domain_url=${encodeURIComponent(domain)}`;
+                         favicon.alt = ""; favicon.width = 16; favicon.height = 16;
+                         favicon.onerror = () => { favicon.style.visibility = 'hidden'; };
+                         faviconContainer.appendChild(favicon);
+                     }
+                 } catch (e) {}
+             }
+             const contentContainer = bookmarkItemElement.querySelector('.bookmark-content');
+             if (contentContainer) {
+                 let displayUrl = bookmarkData.url; try { new URL(displayUrl); } catch(_) { displayUrl = '#'; }
+                 contentContainer.innerHTML = `
+                      <h4><a href="${displayUrl}" target="_blank" rel="noopener noreferrer">${escapeHTML(bookmarkData.title || 'Sin Título')}</a></h4>
+                      ${bookmarkData.desc ? `<p>${escapeHTML(bookmarkData.desc)}</p>` : ''}
+                 `;
+             }
+             bookmarkItemElement.classList.toggle('pinned', !!bookmarkData.isPinned); // Usar !! para booleano
+             const pinBtn = bookmarkItemElement.querySelector('.pin-bookmark-btn');
+             if(pinBtn) pinBtn.classList.toggle('pinned-active', !!bookmarkData.isPinned);
+        }
         // --- Drag & Drop NATIVO ---
-        function handleDragStart(event){ /* ... sin cambios ... */ }
-        function handleDragEnd(event){ /* ... sin cambios ... */ }
-        function handleDragOver(event){ /* ... sin cambios ... */ }
-        function handleDragEnter(event){ /* ... sin cambios ... */ }
-        function handleDragLeave(event){ /* ... sin cambios ... */ }
-        function handleDrop(event) { // Modificado para re-ordenar antes de guardar/render
+        function handleDragStart(event){ if (event.target.classList.contains('bookmark-item')) { draggedItem = event.target; event.dataTransfer.setData('text/plain', draggedItem.dataset.id); event.dataTransfer.effectAllowed = 'move'; setTimeout(() => draggedItem.classList.add('dragging'), 0); } }
+        function handleDragEnd(event){ if(draggedItem) { draggedItem.classList.remove('dragging'); clearDragOverStyles(); draggedItem = null; } }
+        function handleDragOver(event){ event.preventDefault(); event.dataTransfer.dropEffect = 'move'; const targetItem = event.target.closest('.bookmark-item'); const list = event.target.closest('.bookmarks-list'); if (!list || !draggedItem || list !== draggedItem.closest('.bookmarks-list')) { clearDragOverStyles(); return; } clearDragOverStyles(); if (targetItem && targetItem !== draggedItem) { targetItem.classList.add('drag-over'); } }
+        function handleDragEnter(event){ if (event.target.closest('.bookmarks-list')) { event.preventDefault(); } }
+        function handleDragLeave(event){ if (event.target.classList && event.target.classList.contains('bookmark-item')) { event.target.classList.remove('drag-over'); } }
+        function handleDrop(event) {
              event.preventDefault(); if (!draggedItem) return;
              const targetItem = event.target.closest('.bookmark-item');
              const targetList = event.target.closest('.bookmarks-list');
-             if (!targetList || targetList !== draggedItem.closest('.bookmarks-list')) { draggedItem.classList.remove('dragging'); clearDragOverStyles(); draggedItem = null; return; } // Asegurar limpieza si drop es inválido
+             // Validar que se suelta en la misma lista (D&D nativo simple no soporta mover entre columnas fácilmente)
+             if (!targetList || !draggedItem.closest('.bookmarks-list') || targetList !== draggedItem.closest('.bookmarks-list')) {
+                 console.log("Drop fuera de la lista original no permitido en esta versión.");
+                 // No limpiar draggedItem aquí, se hace en dragend
+                 return;
+             }
              clearDragOverStyles();
              if (targetItem && targetItem !== draggedItem) { targetList.insertBefore(draggedItem, targetItem); }
              else { targetList.appendChild(draggedItem); }
-             // Sincronizar, Ordenar (pin), Re-renderizar, Guardar
-             syncAppStateOrderFromDOM();
-             sortAppStateBookmarks();
-             renderAllBookmarksInOrder(); // Re-renderizar es crucial aquí para la consistencia visual post-D&D + Pin
+             syncAppStateOrderFromDOM(); // Actualizar orden en estado
+             sortAppStateBookmarks();    // Aplicar orden Pinned
+             renderAllBookmarksInOrder();// Re-renderizar para consistencia visual
              saveAppState();
-             // Limpieza de draggedItem ahora está en handleDragEnd
         }
-        function clearDragOverStyles(){ /* ... sin cambios ... */ }
-        // Helper para sincronizar orden con DOM
-        function syncAppStateOrderFromDOM() { /* ... sin cambios ... */ }
+        function clearDragOverStyles(){ document.querySelectorAll('.bookmark-item.drag-over').forEach(el => el.classList.remove('drag-over')); }
+        function syncAppStateOrderFromDOM() {
+             const domOrderBookmarks = [];
+              document.querySelectorAll('.column').forEach(column => {
+                 const columnId = column.id;
+                 column.querySelectorAll('.bookmark-item').forEach(item => {
+                     const bookmarkId = item.dataset.id;
+                     const originalBookmark = appState.bookmarks.find(bm => bm.id === bookmarkId);
+                     if (originalBookmark) { domOrderBookmarks.push({ ...originalBookmark, columnId: columnId }); }
+                     else { console.warn("Bookmark del DOM no encontrado en estado durante sync:", bookmarkId); } // Advertir si falta
+                 });
+              });
+             // Comparar y actualizar solo si el orden o columnas cambiaron? Podría ser más eficiente.
+             // Por ahora, simplemente reemplazar.
+             appState.bookmarks = domOrderBookmarks;
+             console.log("Orden del estado sincronizado con DOM.");
+         }
         // --- Búsqueda / Filtrado ---
         function handleSearch(event) { applySearchFilter(); }
-        function applySearchFilter() { /* ... sin cambios ... */ }
+        function applySearchFilter() {
+             const searchTerm = document.getElementById('search-box').value.toLowerCase().trim();
+             document.querySelectorAll('.bookmark-item').forEach(item => {
+                 const title = (item.dataset.title || '').toLowerCase();
+                 const desc = (item.dataset.desc || '').toLowerCase();
+                 const isMatch = searchTerm === '' || title.includes(searchTerm) || desc.includes(searchTerm);
+                 item.classList.toggle('hidden-by-search', !isMatch);
+             });
+        }
         // --- Importar / Exportar ---
-        function handleExport() { /* ... sin cambios ... */ }
-        function handleImportFileChange(event) { /* ... sin cambios ... */ }
+        function handleExport() {
+             try {
+                 syncAppStateOrderFromDOM(); // Asegurar orden DOM
+                 sortAppStateBookmarks();    // Asegurar orden Pin
+                 const dataStr = JSON.stringify(appState, null, 2);
+                 const dataBlob = new Blob([dataStr], {type: "application/json"});
+                 const url = URL.createObjectURL(dataBlob);
+                 const link = document.createElement('a'); link.href = url;
+                 const date = new Date(); const dateStr = `${date.getFullYear()}-${(date.getMonth()+1).toString().padStart(2,'0')}-${date.getDate().toString().padStart(2,'0')}`;
+                 link.download = `bookmarks_export_${dateStr}.json`;
+                 document.body.appendChild(link); link.click(); document.body.removeChild(link);
+                 URL.revokeObjectURL(url);
+             } catch (error) { console.error("Error al exportar:", error); alert("Error al exportar."); }
+        }
+        function handleImportFileChange(event) {
+             const file = event.target.files[0]; if (!file) return;
+             const reader = new FileReader();
+             reader.onload = (e) => {
+                 try {
+                     const importedData = JSON.parse(e.target.result);
+                     if (importedData && Array.isArray(importedData.columns) && Array.isArray(importedData.bookmarks)) {
+                          if (confirm("Importar reemplazará todos los datos actuales. ¿Continuar?")) {
+                              appState = importedData;
+                              // Validar/limpiar datos importados
+                               appState.columns = appState.columns.filter(c => c.id && c.title && c.colorClass); // Filtro básico
+                               appState.bookmarks.forEach(bm => {
+                                   if (!bm.id || !bm.url || !bm.title || !bm.columnId) throw new Error("Bookmark importado inválido");
+                                   if (bm.isPinned === undefined) bm.isPinned = false;
+                                   delete bm.parentId;
+                               });
+                               columnColorIndex = appState.columns.length % COLUMN_COLORS.length; // Resetear índice
+                               renderApp(); saveAppState(); alert("Datos importados.");
+                          }
+                     } else { alert("Error: Formato de archivo inválido."); }
+                 } catch (error) { console.error("Error al importar:", error); alert("Error al parsear el archivo JSON."); }
+                 finally { event.target.value = null; } // Reset input
+             };
+             reader.onerror = () => { alert("Error al leer el archivo."); event.target.value = null; };
+             reader.readAsText(file);
+        }
         // --- Utilidades ---
-        function escapeHTML(str) { /* ... sin cambios ... */ }
-        function getColumnTitleById(columnId) { /* ... sin cambios ... */ }
+        function escapeHTML(str) { if (!str) return ''; const d = document.createElement('div'); d.appendChild(document.createTextNode(str)); return d.innerHTML; }
+        function getColumnTitleById(columnId) { const c = appState.columns.find(c => c.id === columnId); return c ? escapeHTML(c.title) : '???'; }
 
     </script>
 
